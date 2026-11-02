@@ -7,6 +7,10 @@ import android.widget.TextView
 import android.widget.Toast
 import androidx.appcompat.app.AppCompatActivity
 import org.setu.placemarks.models.PlacemarkModel
+import android.net.Uri
+import android.widget.ImageView
+import androidx.activity.result.contract.ActivityResultContracts
+
 class AddEditActivity : AppCompatActivity() {
 
     private lateinit var titleInput: EditText
@@ -16,10 +20,35 @@ class AddEditActivity : AppCompatActivity() {
 
     private var editingId: Long? = null
 
+    private lateinit var imagePreview: ImageView
+    private var selectedImageUri: Uri? = null
+
+    private val imagePicker =
+        registerForActivityResult(ActivityResultContracts.OpenDocument()) { uri: Uri? ->
+            if (uri != null) {
+                try {
+                    contentResolver.takePersistableUriPermission(
+                        uri,
+                        android.content.Intent.FLAG_GRANT_READ_URI_PERMISSION
+                    )
+                } catch (_: SecurityException) {
+                    // Some providers may not grant persistable access.
+                }
+
+                selectedImageUri = uri
+                imagePreview.setImageURI(uri)
+            }
+        }
     override fun onCreate(savedInstanceState: Bundle?) {
         super.onCreate(savedInstanceState)
 
         setContentView(R.layout.activity_add_edit)
+
+        imagePreview = findViewById(R.id.imageViewAdd)
+
+        findViewById<Button>(R.id.imagePickButton).setOnClickListener {
+            imagePicker.launch(arrayOf("image/*"))
+        }
 
         titleInput =
             findViewById(R.id.titleInput)
@@ -81,6 +110,13 @@ class AddEditActivity : AppCompatActivity() {
         descriptionInput.setText(mark.description)
         xInput.setText(mark.x.toString())
         yInput.setText(mark.y.toString())
+        selectedImageUri = mark.imageUri?.let { Uri.parse(it) }
+
+        if (selectedImageUri != null) {
+            imagePreview.setImageURI(selectedImageUri)
+        } else {
+            imagePreview.setImageResource(android.R.drawable.ic_menu_gallery)
+        }
     }
 
     private fun saveMark() {
@@ -112,13 +148,15 @@ class AddEditActivity : AppCompatActivity() {
             return
         }
 
+        try{
         if (editingId == null) {
 
             val mark = PlacemarkModel(
                 title = title,
                 description = description,
                 x = x,
-                y = y
+                y = y,
+                imageUri = selectedImageUri?.toString()
             )
 
             AppData.placedMarks.create(mark)
@@ -136,7 +174,8 @@ class AddEditActivity : AppCompatActivity() {
                 title = title,
                 description = description,
                 x = x,
-                y = y
+                y = y,
+                imageUri = selectedImageUri?.toString()
             )
 
             AppData.placedMarks.update(mark)
@@ -148,6 +187,14 @@ class AddEditActivity : AppCompatActivity() {
             ).show()
         }
 
-        finish()
+            finish()
+
+        } catch (e: IllegalArgumentException) {
+            Toast.makeText(
+                this,
+                e.message ?: "Please check the entered values.",
+                Toast.LENGTH_LONG
+            ).show()
+        }
     }
 }
