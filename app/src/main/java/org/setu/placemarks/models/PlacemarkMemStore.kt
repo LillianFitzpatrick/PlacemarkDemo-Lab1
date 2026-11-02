@@ -11,11 +11,14 @@ class PlacemarkMemStore {
     }
 
     fun create(placemark: PlacemarkModel) {
+        placemark.validate()
         placemark.id = lastId.incrementAndGet()
         placemarks.add(placemark)
     }
 
     fun update(placemark: PlacemarkModel): Boolean {
+        placemark.validate()
+
         val foundPlacemark = findOne(placemark.id)
 
         return if (foundPlacemark != null) {
@@ -23,6 +26,7 @@ class PlacemarkMemStore {
             foundPlacemark.description = placemark.description
             foundPlacemark.x = placemark.x
             foundPlacemark.y = placemark.y
+            foundPlacemark.imageUri = placemark.imageUri
             true
         } else {
             false

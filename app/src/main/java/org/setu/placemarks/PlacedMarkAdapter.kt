@@ -7,6 +7,8 @@ import android.widget.Button
 import android.widget.TextView
 import androidx.recyclerview.widget.RecyclerView
 import org.setu.placemarks.models.PlacemarkModel
+import android.widget.ImageView
+import android.net.Uri
 
 class PlacedMarkAdapter(
     private var marks: List<PlacemarkModel>,
@@ -31,6 +33,11 @@ class PlacedMarkAdapter(
 
         val deleteButton: Button =
             itemView.findViewById(R.id.deleteButton)
+
+        val markImage: ImageView =
+            itemView.findViewById(R.id.markImage)
+
+
     }
 
     override fun onCreateViewHolder(
@@ -57,6 +64,14 @@ class PlacedMarkAdapter(
 
         holder.titleText.text =
             "${mark.id}: ${mark.title}"
+
+        val imageUri = mark.imageUri
+
+        if (imageUri != null) {
+            holder.markImage.setImageURI(Uri.parse(imageUri))
+        } else {
+            holder.markImage.setImageResource(android.R.drawable.ic_menu_gallery)
+        }
 
         holder.descriptionText.text =
             mark.description
