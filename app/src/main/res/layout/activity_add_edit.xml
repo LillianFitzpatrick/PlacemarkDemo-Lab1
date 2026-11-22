@@ -51,6 +51,12 @@
             android:hint="Y Coordinate"
             android:inputType="numberDecimal" />
 
+        <Button
+            android:id="@+id/buttonLoc"
+            android:layout_width="match_parent"
+            android:layout_height="wrap_content"
+            android:text="Choose Location" />
+
         <ImageView
             android:id="@+id/imageViewAdd"
             android:layout_width="match_parent"

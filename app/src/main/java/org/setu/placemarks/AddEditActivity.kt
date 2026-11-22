@@ -10,6 +10,7 @@ import org.setu.placemarks.models.PlacemarkModel
 import android.net.Uri
 import android.widget.ImageView
 import androidx.activity.result.contract.ActivityResultContracts
+import android.content.Intent
 
 class AddEditActivity : AppCompatActivity() {
 
@@ -61,6 +62,35 @@ class AddEditActivity : AppCompatActivity() {
 
         yInput =
             findViewById(R.id.yInput)
+
+        val mapPicker =
+            registerForActivityResult(
+                ActivityResultContracts.StartActivityForResult()
+            ) { result ->
+                if (result.resultCode == RESULT_OK) {
+                    val data = result.data ?: return@registerForActivityResult
+
+                    val selectedLatitude = data.getDoubleExtra("latitude", 0.0)
+                    val selectedLongitude = data.getDoubleExtra("longitude", 0.0)
+
+                    xInput.setText(selectedLatitude.toString())
+                    yInput.setText(selectedLongitude.toString())
+                }
+            }
+
+        findViewById<Button>(R.id.buttonLoc).setOnClickListener {
+            val intent = Intent(this, MapPickerActivity::class.java)
+
+            xInput.text.toString().toDoubleOrNull()?.let {
+                intent.putExtra("latitude", it)
+            }
+
+            yInput.text.toString().toDoubleOrNull()?.let {
+                intent.putExtra("longitude", it)
+            }
+
+            mapPicker.launch(intent)
+        }
 
         val saveButton =
             findViewById<Button>(R.id.saveButton)
