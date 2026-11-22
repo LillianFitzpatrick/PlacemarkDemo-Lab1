@@ -39,6 +39,7 @@ dependencies {
     implementation(libs.androidx.recyclerview)
     implementation(libs.material)
     implementation("org.osmdroid:osmdroid-android:6.1.20")
+    implementation("com.google.code.gson:gson:2.13.2")
     testImplementation(libs.junit)
     androidTestImplementation(libs.androidx.espresso.core)
     androidTestImplementation(libs.androidx.junit)

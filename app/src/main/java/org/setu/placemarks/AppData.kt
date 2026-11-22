@@ -1,7 +1,19 @@
 package org.setu.placemarks
 
 import org.setu.placemarks.models.PlacemarkMemStore
-
+import android.content.Context
+import java.io.File
 object AppData {
-    val placedMarks = PlacemarkMemStore()
+
+    lateinit var placedMarks: PlacemarkMemStore
+        private set
+
+    fun initialize(context: Context) {
+        val file = File(
+            context.filesDir,
+            "place_list.json"
+        )
+
+        placedMarks = PlacemarkMemStore(file)
+    }
 }
